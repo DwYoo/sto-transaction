@@ -1,0 +1,14 @@
+{
+  "name": "sto-transaction",
+  "version": "1.0.0",
+  "description": "order and transaction logic for BAY sto project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "queue-fifo": "^0.2.6"
+  }
+}
