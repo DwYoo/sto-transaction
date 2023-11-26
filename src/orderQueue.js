@@ -56,13 +56,4 @@ class matchEngine {
         return side === 'buy' ? !(price in this.sellOrderQueue) : !(price in this.buyOrderQueue);
     }
 
-    _handleNewPriceBuyOrder(price, order) {
-        this.buyOrderQueue[price] = new Queue();
-        this.buyOrderQueue[price].enqueue(order);
-    }
-    
-    _handleNewPriceSellOrder(price, order) {
-        this.sellOrderQueue[price] = new Queue();
-        this.sellOrderQueue[price].enqueue(order);
-    }   
 }
