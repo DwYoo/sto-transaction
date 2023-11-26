@@ -26,3 +26,8 @@ class Order {
       this.taker_order_id = taker_order_id;
     }
 }
+
+module.exports = {
+    Order,
+    Trade
+}
