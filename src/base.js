@@ -8,7 +8,7 @@ class Order {
       this.qty = qty;
       this.filled_qty = filled_qty;
       this.remaining_qty = remaining_qty;
-      this.status = status;
+      this.status = status; // new, filled, cancelled
       this.created_at = created_at;
       this.updated_at = updated_at;
       this.deleted_at = deleted_at;

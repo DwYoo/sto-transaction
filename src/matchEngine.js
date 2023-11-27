@@ -2,7 +2,7 @@ const Queue = require('queue-fifo');
 const {Order, Trade} = require('./base');
 
 
-class matchEngine {
+class MatchEngine {
     constructor() {
         // key: price, value: queue
         this.buyOrders = {};
@@ -28,20 +28,24 @@ class matchEngine {
                 order.status = 'filled';
                 break;
             }
-            if (_existsSellMakerOrder(order.price)) {
-                _matchWithSellOrder(order);
+            if (this._existsSellMakerOrder(order.price)) {
+                this._matchWithSellOrder(order);
             } else { // no matching order => add to buy queue
-                _addNewBuyOrder(order);
+                this._addNewBuyOrder(order);
             }
         }
     }
 
     _handleNewSellOrder(order) {
         while (true) {
-            if (_existsBuyMakerOrder(order.price)) {
-                _matchWithBuyOrder(order);
+            if (order.remaining_qty <= 0) {
+                order.status = 'filled';
+                break;
+            }
+            if (this._existsBuyMakerOrder(order.price)) {
+                this._matchWithBuyOrder(order);
             } else { // no matching order => add to sell queue
-                _addNewSellOrder(order);
+                this._addNewSellOrder(order);
             }
         }
     }
@@ -53,6 +57,8 @@ class matchEngine {
         const makerOrder = queue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
         const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
+        console.log(trade);
+        //TODO: add trade to batch. 
         makerOrder.remaining_qty -= tradeQty;
         makerOrder.filled_qty += tradeQty;
         order.remaining_qty -= tradeQty;
@@ -65,17 +71,19 @@ class matchEngine {
 
     _matchWithSellOrder(order) {
         const tradePrice = order.price;
-        const queue = this.sellOrders[tradePrice];
-        const makerOrder = queue.peek();
+        const sellQueue = this.sellOrders[tradePrice];
+        const makerOrder = sellQueue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
         const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
+        console.log(trade);
+        //TODO: add trade to batch. 
         makerOrder.remaining_qty -= tradeQty;
         makerOrder.filled_qty += tradeQty;
         order.remaining_qty -= tradeQty;
         order.filled_qty += tradeQty;
         if (makerOrder.remaining_qty <= 0) {
             makerOrder.status = 'filled';
-            queue.dequeue();
+            sellQueue.dequeue();
         }
     }
 
@@ -117,3 +125,5 @@ class matchEngine {
     }
 
 }
+
+module.exports = MatchEngine;
