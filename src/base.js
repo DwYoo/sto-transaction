@@ -15,16 +15,29 @@ class Order {
     }
   }
 
-  class Trade {
-    constructor(trade_id, st_id, trade_price, trade_qty, traded_at, maker_order_id, taker_order_id) {
-      this.trade_id = trade_id;
-      this.st_id = st_id;
-      this.trade_price = trade_price;
-      this.trade_qty = trade_qty;
-      this.traded_at = traded_at;
-      this.maker_order_id = maker_order_id;
-      this.taker_order_id = taker_order_id;
-    }
+class Trade {
+  constructor(id, st_id, price, qty, traded_at, maker_order_id, taker_order_id) {
+    this.id = id;
+    this.st_id = st_id;
+    this.price = price;
+    this.qty = qty;
+    this.traded_at = traded_at;
+    this.maker_order_id = maker_order_id;
+    this.taker_order_id = taker_order_id;
+  }
+}
+
+class Transaction {
+  constructor(st_id, trade_id, price, qty, from_account, to_account, created_at) {
+    this.trade_id = trade_id;
+    this.st_id = st_id;
+    this.price = price;
+    this.qty = qty;
+    this.from_account = from_account;
+    this.to_account = to_account;
+    this.created_at = created_at;
+  }
+    
 }
 
 module.exports = {

@@ -32,6 +32,7 @@ class MatchEngine {
                 this._matchWithSellOrder(order);
             } else { // no matching order => add to buy queue
                 this._addNewBuyOrder(order);
+                break;
             }
         }
     }
@@ -46,6 +47,7 @@ class MatchEngine {
                 this._matchWithBuyOrder(order);
             } else { // no matching order => add to sell queue
                 this._addNewSellOrder(order);
+                break;
             }
         }
     }
@@ -90,7 +92,7 @@ class MatchEngine {
 
     _addNewBuyOrder(order) {
         const price = order.price;
-        if (!price in this.buyOrders) {
+        if (!(price in this.buyOrders)) {
             this.buyOrders[price] = new Queue();
         }
         this.buyOrders[price].enqueue(order);
@@ -98,27 +100,27 @@ class MatchEngine {
 
     _addNewSellOrder(order) {
         const price = order.price;
-        if (!price in this.sellOrders) {
+        if (!(price in this.sellOrders)) {
             this.sellOrders[price] = new Queue();
         }
         this.sellOrders[price].enqueue(order);
     }
 
     _existsBuyMakerOrder(price) {
-        if (!price in this.buyOrders) {
+        if (!(price in this.buyOrders)) {
             return false;
         }
-        if (this.buyOrders[price].length === 0) {
+        if (this.buyOrders[price].size === 0) {
             return false;
         } 
         return true;
     }
     
     _existsSellMakerOrder(price) {
-        if (!price in this.sellOrders) {
+        if (!(price in this.sellOrders)) {
             return false;
         }
-        if (this.sellOrders[price].length === 0) {
+        if (this.sellOrders[price].size === 0) {
             return false;
         }
         return true;
