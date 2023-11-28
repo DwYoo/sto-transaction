@@ -3,13 +3,15 @@ const {Order, Trade} = require('./base');
 
 
 class MatchEngine {
-    constructor() {
+    constructor(stId, tickSize) {
+        this.stId = stId;
+        this.tickSize = tickSize;
         // key: price, value: queue
-        this.buyOrders = {};
-        this.sellOrders = {};
+        this.asks = {};
+        this.bids = {};
         this.orders = {
-            buy: this.buyOrders,
-            sell: this.sellOrders
+            asks: this.asks,
+            bisd: this.bids
         };
       }
 
@@ -24,7 +26,7 @@ class MatchEngine {
     
     _handleNewBuyOrder(order) {
         while (true) {
-            if (order.remaining_qty <= 0) {
+            if (order.remaining_qty === 0) {
                 order.status = 'filled';
                 break;
             }
@@ -39,7 +41,7 @@ class MatchEngine {
 
     _handleNewSellOrder(order) {
         while (true) {
-            if (order.remaining_qty <= 0) {
+            if (order.remaining_qty === 0) {
                 order.status = 'filled';
                 break;
             }
@@ -55,8 +57,8 @@ class MatchEngine {
 
     _matchWithBuyOrder(order) {
         const tradePrice = order.price;
-        const queue = this.buyOrders[tradePrice];
-        const makerOrder = queue.peek();
+        const bidQueue = this.bids[tradePrice];
+        const makerOrder = bidQueue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
         const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
         console.log(trade);
@@ -65,16 +67,16 @@ class MatchEngine {
         makerOrder.filled_qty += tradeQty;
         order.remaining_qty -= tradeQty;
         order.filled_qty += tradeQty;
-        if (makerOrder.remaining_qty <= 0) {
+        if (makerOrder.remaining_qty === 0) {
             makerOrder.status = 'filled';
-            queue.dequeue();
+            bidQueue.dequeue();
         }
     }
 
     _matchWithSellOrder(order) {
         const tradePrice = order.price;
-        const sellQueue = this.sellOrders[tradePrice];
-        const makerOrder = sellQueue.peek();
+        const askQueue = this.asks[tradePrice];
+        const makerOrder = askQueue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
         const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
         console.log(trade);
@@ -83,44 +85,44 @@ class MatchEngine {
         makerOrder.filled_qty += tradeQty;
         order.remaining_qty -= tradeQty;
         order.filled_qty += tradeQty;
-        if (makerOrder.remaining_qty <= 0) {
+        if (makerOrder.remaining_qty === 0) {
             makerOrder.status = 'filled';
-            sellQueue.dequeue();
+            bidQueue.dequeue();
         }
     }
 
 
     _addNewBuyOrder(order) {
         const price = order.price;
-        if (!(price in this.buyOrders)) {
-            this.buyOrders[price] = new Queue();
+        if (!(price in this.asks)) {
+            this.asks[price] = new Queue();
         }
-        this.buyOrders[price].enqueue(order);
+        this.asks[price].enqueue(order);
     }
 
     _addNewSellOrder(order) {
         const price = order.price;
-        if (!(price in this.sellOrders)) {
-            this.sellOrders[price] = new Queue();
+        if (!(price in this.bids)) {
+            this.bids[price] = new Queue();
         }
-        this.sellOrders[price].enqueue(order);
+        this.bids[price].enqueue(order);
     }
 
     _existsBuyMakerOrder(price) {
-        if (!(price in this.buyOrders)) {
+        if (!(price in this.asks)) {
             return false;
         }
-        if (this.buyOrders[price].size === 0) {
+        if (this.asks[price].size === 0) {
             return false;
         } 
         return true;
     }
     
     _existsSellMakerOrder(price) {
-        if (!(price in this.sellOrders)) {
+        if (!(price in this.bids)) {
             return false;
         }
-        if (this.sellOrders[price].size === 0) {
+        if (this.bids[price].size === 0) {
             return false;
         }
         return true;

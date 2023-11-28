@@ -16,14 +16,15 @@ class Order {
   }
 
 class Trade {
-  constructor(id, st_id, price, qty, traded_at, maker_order_id, taker_order_id) {
+  constructor(id, st_id, price, qty, traded_at, maker_order, taker_order) {
     this.id = id;
     this.st_id = st_id;
     this.price = price;
     this.qty = qty;
     this.traded_at = traded_at;
-    this.maker_order_id = maker_order_id;
-    this.taker_order_id = taker_order_id;
+    this.maker_order = maker_order;
+    this.taker_order = taker_order;
+    this.is_buyer_maker = this.maker_order.side === 'buy';
   }
 }
 
@@ -36,6 +37,19 @@ class Transaction {
     this.from_account = from_account;
     this.to_account = to_account;
     this.created_at = created_at;
+  }
+
+  static fromTrade(trade) {
+    if (trade.is_buyer_maker){
+      from_account = trade.maker_order.user_id;
+      to_account = trade.taker_order.user_id;
+    }
+    else{
+      from_account = trade.taker_order.user_id;
+      to_account = trade.maker_order.user_id;
+    }
+    to_account = trade.taker_order_id;
+    return new Transaction(trade.st_id, trade.id, trade.price, trade.qty, from_account, to_account, trade.traded_at);
   }
     
 }
