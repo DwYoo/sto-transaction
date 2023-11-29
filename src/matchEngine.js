@@ -1,11 +1,12 @@
 const Queue = require('queue-fifo');
-const {Order, Trade} = require('./base');
+const {ST, Order, Trade} = require('./base');
 
 
 class MatchEngine {
-    constructor(stId, tickSize) {
-        this.stId = stId;
-        this.tickSize = tickSize;
+    constructor(st) {
+        this.st = st;
+        this.price_tick = st.price_tick;
+        this.qty_tick = st.qty_tick;
         // key: price, value: queue
         this.asks = {};
         this.bids = {};
@@ -60,7 +61,7 @@ class MatchEngine {
         const bidQueue = this.bids[tradePrice];
         const makerOrder = bidQueue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-        const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
+        const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder, order);
         console.log(trade);
         //TODO: add trade to batch. 
         makerOrder.remaining_qty -= tradeQty;
@@ -78,7 +79,7 @@ class MatchEngine {
         const askQueue = this.asks[tradePrice];
         const makerOrder = askQueue.peek();
         const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-        const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder.id, order.id);
+        const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder, order);
         console.log(trade);
         //TODO: add trade to batch. 
         makerOrder.remaining_qty -= tradeQty;
