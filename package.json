@@ -9,6 +9,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.6.0",
+    "dotenv": "^16.3.1",
     "queue-fifo": "^0.2.6"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.1",
+    "prisma": "^5.6.0",
+    "tokio": "^0.1.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
   }
 }
