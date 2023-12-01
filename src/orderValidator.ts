@@ -1,57 +1,53 @@
-const {ST, Order, Trade} = require('./base');
+import { ISt, IOrder, ITrade } from './base';
 
 
 class OrderValidator {
-    constructor(st) {
+    st: ISt;
+    constructor(st:ISt) {
         this.st = st;
     }
 
-    static validateOrder(order) {
+    validateOrder(order:IOrder) {
         //return true if valid, false with error if invalid
         try {
-            OrderValidator.validateStId(order.st_id);
-            OrderValidator.validateSide(order.side);
-            OrderValidator.validateQty(order.qty, this.st.qty_tick);
-            OrderValidator.validatePrice(order.price, this.st.price_tick);
-            OrderValidator.validateOrderStatus(order.status);
+            this.validateStId(order.st_id);
+            this.validateSide(order.side);
+            this.validateQty(order.qty, this.st.qty_tick);
+            this.validatePrice(order.price, this.st.price_tick);
+            this.validateOrderStatus(order.status);
             return [true, null];
         } catch (e) {
             return [false, e];
        }
     }
 
-    
-    static validateUserBalance(userBalance, order) {
-        //return true if valid, false with error if invalid
-        
-    }
 
-    static validateUserBalanceBuyOrder(userFiatBalance, price, qty) {
+    validateUserBalanceBuyOrder(userFiatBalance:number, price:number, qty:number) {
         const totalCost = price * qty;
         if (userFiatBalance < totalCost) {
             throw new Error('Invalid order: insufficient fiat balance');
         }
     }
 
-    static validateUserBalanceSellOrder(userStBalance, qty) {
+    validateUserBalanceSellOrder(userStBalance:number, qty:number) {
         if (userStBalance < qty) {
             throw new Error('Invalid order: insufficient st balance');
         }
     }
 
-    static validateStId(stId) {
+    validateStId(stId:number) {
         if (stId !== this.st.id) {
             throw new Error('Invalid order stId: ST ID mismatch');
         }
     }
 
-    static validateSide(side) {
+    validateSide(side:string) {
         if (side !== 'buy' && side !== 'sell') {
             throw new Error('Invalid order side: side must be either buy or sell');
         }
     }
 
-    static validateQty(qty, qtyTick) {
+    validateQty(qty:number, qtyTick:number) {
         if (qty <= 0) {
             throw new Error('Invalid order qty: qty must be greater than 0');
         }
@@ -61,7 +57,7 @@ class OrderValidator {
         }
     }
     
-    static validatePrice(price, priceTick) {
+    validatePrice(price:number, priceTick:number) {
         if (price <= 0) {
             throw new Error('Invalid order price: price must be greater than 0');
         }
@@ -72,7 +68,7 @@ class OrderValidator {
         }
     }
 
-    static validateOrderStatus(orderStatus) {
+    validateOrderStatus(orderStatus:string) {
         if (orderStatus !== 'new') {
             throw new Error('Invalid order status: order status must be new');
         }
