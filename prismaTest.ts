@@ -1,6 +1,4 @@
 // 예제 코드
-require('dotenv').config();
-
 import { PrismaClient } from './prisma/generated/client'
 const prisma = new PrismaClient();
 

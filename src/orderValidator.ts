@@ -1,6 +1,5 @@
 import { ISt, IOrder, ITrade } from './base';
 
-
 class OrderValidator {
     st: ISt;
     constructor(st:ISt) {
@@ -51,7 +50,6 @@ class OrderValidator {
         if (qty <= 0) {
             throw new Error('Invalid order qty: qty must be greater than 0');
         }
-        qtyTick = qtyTick * (10 ** 6);
         if (qty % qtyTick !== 0) {
             throw new Error('Invalid order qty: check qty tick');
         }
@@ -61,8 +59,6 @@ class OrderValidator {
         if (price <= 0) {
             throw new Error('Invalid order price: price must be greater than 0');
         }
-        price = price * (10 ** 6);
-        priceTick = priceTick * (10 ** 6);
         if (price % priceTick !== 0) {
             throw new Error('Invalid order price: check price tick');
         }
@@ -76,3 +72,4 @@ class OrderValidator {
 
 
 }
+export {OrderValidator}

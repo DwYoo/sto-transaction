@@ -112,7 +112,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\repositories\\sto-transaction\\prisma\\generated\\client",
+      "value": "/home/dongwoo/github.com/DwYoo/sto-transaction/prisma/generated/client",
       "fromEnvVar": null
     },
     "config": {
@@ -121,7 +121,7 @@ const config = {
     "binaryTargets": [
       {
         "fromEnvVar": null,
-        "value": "windows",
+        "value": "debian-openssl-3.0.x",
         "native": true
       }
     ],

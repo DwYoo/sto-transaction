@@ -77,8 +77,7 @@ class MatchEngine {
         const makerOrder = bidQueue.peek();
         if (makerOrder) {
             const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-            const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder, order);
-            console.log(trade);
+            console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, order);
             //TODO: add trade to batch. 
             makerOrder.remaining_qty -= tradeQty;
             makerOrder.filled_qty += tradeQty;
@@ -99,8 +98,7 @@ class MatchEngine {
         const makerOrder = askQueue.peek();
         if (makerOrder) {
             const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-            const trade = new Trade(null, null, tradePrice, tradeQty, Date.now(), makerOrder, order);
-            console.log(trade);
+            console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, order);
             //TODO: add trade to batch. 
             makerOrder.remaining_qty -= tradeQty;
             makerOrder.filled_qty += tradeQty;
@@ -115,16 +113,7 @@ class MatchEngine {
         }
     }
 
-
     _addNewBuyOrder(order:IOrder) {
-        const price = order.price;
-        if (!(price in this.asks)) {
-            this.asks[price] = new Queue();
-        }
-        this.asks[price].enqueue(order);
-    }
-
-    _addNewSellOrder(order:IOrder) {
         const price = order.price;
         if (!(price in this.bids)) {
             this.bids[price] = new Queue();
@@ -132,21 +121,29 @@ class MatchEngine {
         this.bids[price].enqueue(order);
     }
 
-    _existsBuyMakerOrder(price:number) {
+    _addNewSellOrder(order:IOrder) {
+        const price = order.price;
         if (!(price in this.asks)) {
+            this.asks[price] = new Queue();
+        }
+        this.asks[price].enqueue(order);
+    }
+
+    _existsBuyMakerOrder(price:number) {
+        if (!(price in this.bids)) {
             return false;
         }
-        if (this.asks[price].size() === 0) {
+        if (this.bids[price].size() === 0) {
             return false;
         } 
         return true;
     }
     
     _existsSellMakerOrder(price:number) {
-        if (!(price in this.bids)) {
+        if (!(price in this.asks)) {
             return false;
         }
-        if (this.bids[price].size() === 0) {
+        if (this.asks[price].size() === 0) {
             return false;
         }
         return true;
