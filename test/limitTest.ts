@@ -116,12 +116,10 @@ console.log(orderValidator.validateOrder(order5));
 console.log(orderValidator.validateOrder(order6));
 console.log(orderValidator.validateOrder(order7));
 
-
-
-matchEngine.handleNewOrder(order1);
-matchEngine.handleNewOrder(order2);
-matchEngine.handleNewOrder(order3);
-matchEngine.handleNewOrder(order4);
+matchEngine.handleNewLimitOrder(order1);
+matchEngine.handleNewLimitOrder(order2);
+matchEngine.handleNewLimitOrder(order3);
+matchEngine.handleNewLimitOrder(order4);
 console.log(matchEngine.bids['100'].peek());
 console.log(matchEngine.asks['110'].peek());
 

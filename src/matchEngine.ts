@@ -30,17 +30,37 @@ class MatchEngine {
             bids: this.bids
         };
       }
-
+    
     handleNewOrder(order:IOrder) {
-        if (order.side === 'buy') {
-            this._handleNewBuyOrder(order);
+        if (order.type === 'limit') {
+            this._handleNewLimitOrder(order);
         }
-        if (order.side === 'sell') {
-            this._handleNewSellOrder(order);
+        if (order.type === 'market') {
+            this._handleNewMarketOrder(order);
         }
     }
+
+
+    _handleNewLimitOrder(order:IOrder) {
+        if (order.side === 'buy') {
+            this._handleNewLimitBuyOrder(order);
+        }
+        if (order.side === 'sell') {
+            this._handleNewLimitSellOrder(order);
+        }
+    }
+
+    _handleNewMarketOrder(order:IOrder) {
+        if (order.side === 'buy') {
+            this._handleNewMarketBuyOrder(order);
+        }
+        if (order.side === 'sell') {
+            this._handleNewMarketSellOrder(order);
+        }
+    }
+
     
-    _handleNewBuyOrder(order:IOrder) {
+    _handleNewLimitBuyOrder(order:IOrder) {
         while (true) {
             if (order.remaining_qty === 0) {
                 order.status = 'filled';
@@ -55,7 +75,7 @@ class MatchEngine {
         }
     }
 
-    _handleNewSellOrder(order:IOrder) {
+    _handleNewLimitSellOrder(order:IOrder) {
         while (true) {
             if (order.remaining_qty === 0) {
                 order.status = 'filled';
@@ -70,7 +90,21 @@ class MatchEngine {
         }
     }
 
+    _handleNewMarketBuyOrder(order: IOrder) {
 
+    }
+    
+    _handleNewMarketSellOrder(order: IOrder) {
+
+    }
+
+    _getBestBuyPrice(){
+
+    }
+    _getBestSellPrice(){
+
+    }
+    
     _matchWithBuyOrder(order:IOrder) {
         const tradePrice = order.price;
         const bidQueue = this.bids[tradePrice];

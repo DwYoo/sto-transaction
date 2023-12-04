@@ -17,6 +17,7 @@ interface IOrder {
   id: number;
   user_id: number;
   st_id: number;
+  type: string;
   side: string;
   price: number; //price is scaled by 10^6
   qty: number;
