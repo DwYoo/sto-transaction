@@ -95,33 +95,39 @@ class MatchEngine {
     }
 
     _handleNewMarketBuyOrder(order: IOrder) {
-        if ()
+        if (order.remaining_qty < this.totalAsks) {
+            throw new Error (`Market order qty cannot exceed ${this.totalAsks}`)
+        }
         while (true) {
             if (order.remaining_qty === 0) {
                 order.status = 'filled';
                 break;
             }
-            if (Object.keys(this.asks).length > 0) {
-
+            const makerOrder:IOrder|null = this.asks[this._getBestAskPrice()].peek()
+            if (makerOrder) {
+                this._match(makerOrder, order, false)
             }
-            else {
-                throw new Error("")
-            }
-            
         }
     }
     
     _handleNewMarketSellOrder(order: IOrder) {
+        if (order.remaining_qty < this.totalBids) {
+            throw new Error (`Market order qty cannot exceed ${this.totalBids}`)
+        }
         while (true) {
             if (order.remaining_qty === 0) {
                 order.status = 'filled';
                 break;
             }
+            const makerOrder:IOrder|null = this.bids[this._getBestBidPrice()].peek()
+            if (makerOrder) {
+                this._match(makerOrder, order, true)
+            }
         }
 
     }
 
-    _getBestBuyPrice(): number {
+    _getBestBidPrice(): number {
         const bidPrices = Object.keys(this.bids).map(Number).filter(price => this.bids[price].size() > 0).sort((a, b) => b - a);
         if (bidPrices.length === 0) {
             throw new Error('There is no bid order');
@@ -130,12 +136,30 @@ class MatchEngine {
     }
 
 
-    _getBestSellPrice(): number{
+    _getBestAskPrice(): number{
         const askPrices = Object.keys(this.asks).map(Number).filter(price => this.asks[price].size() > 0).sort((a, b) => a - b);
         if (askPrices.length === 0) {
             throw new Error('There is no ask order'); 
         }
         return askPrices[0];
+    }
+
+    _match(makerOrder:IOrder, takerOrder:IOrder, isBuyerMaker:boolean) {
+        const tradePrice = makerOrder.price
+        const makerQueue :Queue<IOrder> = isBuyerMaker? this.bids[tradePrice] : this.asks[tradePrice]
+        const tradeQty = Math.min(makerOrder.remaining_qty, takerOrder.remaining_qty);
+        console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, takerOrder, isBuyerMaker); //추후 수정
+        makerOrder.remaining_qty -= tradeQty;
+        makerOrder.filled_qty += tradeQty;
+        takerOrder.remaining_qty -= tradeQty;
+        takerOrder.filled_qty += tradeQty;
+        if (makerOrder.remaining_qty === 0) {
+            makerOrder.status = 'filled';
+            makerQueue.dequeue();
+            if (makerQueue.isEmpty()) {
+                this._removePrice(isBuyerMaker? this.bids : this.asks, tradePrice);
+            }
+        }
     }
     
     _matchWithBuyOrder(order:IOrder) {
@@ -143,20 +167,7 @@ class MatchEngine {
         const bidQueue = this.bids[tradePrice];
         const makerOrder = bidQueue.peek();
         if (makerOrder) {
-            const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-            console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, order);
-            //TODO: add trade to batch. 
-            makerOrder.remaining_qty -= tradeQty;
-            makerOrder.filled_qty += tradeQty;
-            order.remaining_qty -= tradeQty;
-            order.filled_qty += tradeQty;
-            if (makerOrder.remaining_qty === 0) {
-                makerOrder.status = 'filled';
-                bidQueue.dequeue();
-                if (bidQueue.isEmpty()) {
-                    this._removePrice(this.bids, tradePrice);
-                }
-            }
+            this._match(makerOrder, order, true)
         } else {
         throw new Error('Buy order queue is empty');
     }
@@ -167,20 +178,7 @@ class MatchEngine {
         const askQueue = this.asks[tradePrice];
         const makerOrder = askQueue.peek();
         if (makerOrder) {
-            const tradeQty = Math.min(makerOrder.remaining_qty, order.remaining_qty);
-            console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, order);
-            //TODO: add trade to batch. 
-            makerOrder.remaining_qty -= tradeQty;
-            makerOrder.filled_qty += tradeQty;
-            order.remaining_qty -= tradeQty;
-            order.filled_qty += tradeQty;
-            if (makerOrder.remaining_qty === 0) {
-                makerOrder.status = 'filled';
-                askQueue.dequeue();
-                if (askQueue.isEmpty()) {
-                    this._removePrice(this.asks, tradePrice);
-                }
-            }
+            this._match(makerOrder, order, false)
         } else {
         throw new Error('Sell order queue is empty');
         }
@@ -192,7 +190,7 @@ class MatchEngine {
             this.bids[price] = new Queue();
         }
         this.bids[price].enqueue(order);
-        this.t
+        this.totalBids += order.remaining_qty;
     }
 
     _addNewSellOrder(order:IOrder) {
@@ -201,6 +199,7 @@ class MatchEngine {
             this.asks[price] = new Queue();
         }
         this.asks[price].enqueue(order);
+        this.totalBids += order.remaining_qty;
     }
 
     _existsBuyMakerOrder(price:number) {
