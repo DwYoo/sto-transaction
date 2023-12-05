@@ -12,7 +12,10 @@ class OrderValidator {
             this.validateStId(order.st_id);
             this.validateSide(order.side);
             this.validateQty(order.qty, this.st.qty_tick);
-            this.validatePrice(order.price, this.st.price_tick);
+            this.validateType(order.type);
+            if (order.type === 'limit') {
+                this.validatePrice(order.price, this.st.price_tick);
+            }
             this.validateOrderStatus(order.status);
             return [true, null];
         } catch (e) {
@@ -43,6 +46,12 @@ class OrderValidator {
     validateSide(side:string) {
         if (side !== 'buy' && side !== 'sell') {
             throw new Error('Invalid order side: side must be either buy or sell');
+        }
+    }
+
+    validateType(type:string) {
+        if (type !== 'limit' && type !== 'market') {
+            throw new Error('Invalid order type: type must be either limit or market')
         }
     }
 
