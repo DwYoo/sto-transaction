@@ -7,6 +7,7 @@ const order1: IOrder = {
   user_id:1, 
   st_id: 1, 
   side: 'buy',
+  type: 'limit',
   price: 100, 
   qty: 10, 
   filled_qty:0, 
@@ -20,6 +21,7 @@ const order2: IOrder = {
   user_id: 2,
   st_id: 1,
   side: 'sell',
+  type: 'limit',
   price: 100,
   qty: 20,
   filled_qty: 0,
@@ -33,6 +35,7 @@ const order3: IOrder = {
   user_id: 3,
   st_id: 1,
   side: 'buy',
+  type: 'limit',
   price: 90,
   qty: 30,
   filled_qty: 0,
@@ -46,6 +49,7 @@ const order4: IOrder = {
   user_id: 4,
   st_id: 1,
   side: 'sell',
+  type: 'limit',
   price: 110,
   qty: 40,
   filled_qty: 0,
@@ -59,6 +63,7 @@ const order5: IOrder = {
   user_id: 4,
   st_id: 1,
   side: 'sell',
+  type: 'limit',
   price: 105,
   qty: 10,
   filled_qty: 0,
@@ -72,6 +77,7 @@ const order6: IOrder = {
   user_id: 4,
   st_id: 1,
   side: 'sell',
+  type: 'limit',
   price: 0,
   qty: -1,
   filled_qty: 0,
@@ -85,6 +91,7 @@ const order7: IOrder = {
   user_id: 4,
   st_id: 1,
   side: 'sell',
+  type: 'limit',
   price: 0,
   qty: 21,
   filled_qty: 0,
@@ -116,10 +123,10 @@ console.log(orderValidator.validateOrder(order5));
 console.log(orderValidator.validateOrder(order6));
 console.log(orderValidator.validateOrder(order7));
 
-matchEngine.handleNewLimitOrder(order1);
-matchEngine.handleNewLimitOrder(order2);
-matchEngine.handleNewLimitOrder(order3);
-matchEngine.handleNewLimitOrder(order4);
+matchEngine.handleNewOrder(order1);
+matchEngine.handleNewOrder(order2);
+matchEngine.handleNewOrder(order3);
+matchEngine.handleNewOrder(order4);
 console.log(matchEngine.bids['100'].peek());
 console.log(matchEngine.asks['110'].peek());
 

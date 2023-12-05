@@ -49,8 +49,11 @@ class MatchEngine {
         if (order.side === 'buy') {
             this._handleNewLimitBuyOrder(order);
         }
-        if (order.side === 'sell') {
+        else if (order.side === 'sell') {
             this._handleNewLimitSellOrder(order);
+        }
+        else {
+            throw new Error ("Order side must be either buy or sell")
         }
     }
 
@@ -58,8 +61,11 @@ class MatchEngine {
         if (order.side === 'buy') {
             this._handleNewMarketBuyOrder(order);
         }
-        if (order.side === 'sell') {
+        else if (order.side === 'sell') {
             this._handleNewMarketSellOrder(order);
+        }
+        else {
+            throw new Error ("Order side must be either buy or sell")
         }
     }
 
@@ -93,6 +99,7 @@ class MatchEngine {
             }
         }
     }
+
 
     _handleNewMarketBuyOrder(order: IOrder) {
         if (order.remaining_qty < this.totalAsks) {
@@ -148,7 +155,6 @@ class MatchEngine {
         const tradePrice = makerOrder.price
         const makerQueue :Queue<IOrder> = isBuyerMaker? this.bids[tradePrice] : this.asks[tradePrice]
         const tradeQty = Math.min(makerOrder.remaining_qty, takerOrder.remaining_qty);
-        console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, takerOrder, isBuyerMaker); //추후 수정
         makerOrder.remaining_qty -= tradeQty;
         makerOrder.filled_qty += tradeQty;
         takerOrder.remaining_qty -= tradeQty;
@@ -160,6 +166,7 @@ class MatchEngine {
                 this._removePrice(isBuyerMaker? this.bids : this.asks, tradePrice);
             }
         }
+        console.log("new trade:\n", tradePrice, tradeQty, Date.now(), makerOrder, takerOrder, isBuyerMaker); //추후 수정
     }
     
     _matchWithBuyOrder(order:IOrder) {
