@@ -18,6 +18,8 @@ class MatchEngine {
     asks: IOneSideOrderBook;
     bids: IOneSideOrderBook;
     orders: IOrderBook;
+    totalAsks: number
+    totalBids: number
     constructor(st:ISt) {
         this.st = st;
         this.price_tick = st.price_tick;
@@ -29,6 +31,8 @@ class MatchEngine {
             asks: this.asks,
             bids: this.bids
         };
+        this.totalAsks = 0;
+        this.totalBids = 0;
       }
     
     handleNewOrder(order:IOrder) {
@@ -91,18 +95,47 @@ class MatchEngine {
     }
 
     _handleNewMarketBuyOrder(order: IOrder) {
+        if ()
+        while (true) {
+            if (order.remaining_qty === 0) {
+                order.status = 'filled';
+                break;
+            }
+            if (Object.keys(this.asks).length > 0) {
 
+            }
+            else {
+                throw new Error("")
+            }
+            
+        }
     }
     
     _handleNewMarketSellOrder(order: IOrder) {
+        while (true) {
+            if (order.remaining_qty === 0) {
+                order.status = 'filled';
+                break;
+            }
+        }
 
     }
 
-    _getBestBuyPrice(){
-
+    _getBestBuyPrice(): number {
+        const bidPrices = Object.keys(this.bids).map(Number).filter(price => this.bids[price].size() > 0).sort((a, b) => b - a);
+        if (bidPrices.length === 0) {
+            throw new Error('There is no bid order');
+        }
+        return bidPrices[0];
     }
-    _getBestSellPrice(){
 
+
+    _getBestSellPrice(): number{
+        const askPrices = Object.keys(this.asks).map(Number).filter(price => this.asks[price].size() > 0).sort((a, b) => a - b);
+        if (askPrices.length === 0) {
+            throw new Error('There is no ask order'); 
+        }
+        return askPrices[0];
     }
     
     _matchWithBuyOrder(order:IOrder) {
@@ -120,6 +153,9 @@ class MatchEngine {
             if (makerOrder.remaining_qty === 0) {
                 makerOrder.status = 'filled';
                 bidQueue.dequeue();
+                if (bidQueue.isEmpty()) {
+                    this._removePrice(this.bids, tradePrice);
+                }
             }
         } else {
         throw new Error('Buy order queue is empty');
@@ -141,6 +177,9 @@ class MatchEngine {
             if (makerOrder.remaining_qty === 0) {
                 makerOrder.status = 'filled';
                 askQueue.dequeue();
+                if (askQueue.isEmpty()) {
+                    this._removePrice(this.asks, tradePrice);
+                }
             }
         } else {
         throw new Error('Sell order queue is empty');
@@ -153,6 +192,7 @@ class MatchEngine {
             this.bids[price] = new Queue();
         }
         this.bids[price].enqueue(order);
+        this.t
     }
 
     _addNewSellOrder(order:IOrder) {
@@ -183,6 +223,12 @@ class MatchEngine {
         return true;
     }
 
+    _removePrice(obj: IOneSideOrderBook, key: number): Object {
+        const { [key]: deletedKey, ...rest } = obj;
+        return rest;
+    }
 }
+
+
 
 export { MatchEngine };
